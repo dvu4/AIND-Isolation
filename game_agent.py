@@ -14,6 +14,83 @@ class Timeout(Exception):
     pass
 
 
+# HEURISTIC .
+def heuristic_score_player_moves(game, player):
+    if game.is_winner(player):
+        return float('inf')
+    if game.is_loser(player):
+        return float('-inf')
+
+    player_moves = game.get_legal_moves(player)
+
+    return float(len(player_moves))
+
+
+# HEURISTIC improved_score.
+def heuristic_score_normal_difference_moves(game, player):
+    if game.is_winner(player):
+        return float('inf')
+    if game.is_loser(player):
+        return float('-inf')
+
+    player_moves = game.get_legal_moves(player)
+    opponent_moves = game.get_legal_moves(game.get_opponent(player))
+
+    return float(len(player_moves) - len(opponent_moves))
+
+
+# HEURISTIC : difference of squared number of legal moves of player and opponent
+def heuristic_score_quadratic_difference_moves(game, player):
+    if game.is_winner(player):
+        return float('inf')
+    if game.is_loser(player):
+        return float('-inf')
+
+    player_moves = game.get_legal_moves(player)
+    opponent_moves = game.get_legal_moves(game.get_opponent(player))
+
+    return float(len(player_moves)*len(player_moves) - len(opponent_moves)*len(opponent_moves))
+
+
+# HEURISTIC: min of 3 heuristics.
+def heuristic_score_min_custom_score(game, player):
+    if game.is_winner(player):
+        return float('inf')
+    if game.is_loser(player):
+        return float('-inf')
+
+    functions = [heuristic_score_player_moves(game, player), 
+                heuristic_score_normal_difference_moves(game, player), 
+                heuristic_score_quadratic_difference_moves(game, player)]
+
+    return min(functions)
+
+    # HEURISTIC: assign weights to 3 heuristics.
+def heuristic_score_final_custom_score(game, player, pm_weight=0.1, ndm_weight=2, qdm_weight= 0.4):
+    if game.is_winner(player):
+        return float('inf')
+    if game.is_loser(player):
+        return float('-inf')
+
+    functions = [heuristic_score_player_moves(game, player), 
+                heuristic_score_normal_difference_moves(game, player), 
+                heuristic_score_quadratic_difference_moves(game, player)]
+
+    weights = [pm_weight, ndm_weight, qdm_weight]   
+
+    return float(sum([i*j for i,j in zip(weights, functions)]))
+
+
+
+heuristic = {
+    'heuristic_score_player_moves': heuristic_score_player_moves,
+    'heuristic_score_normal_difference_moves': heuristic_score_normal_difference_moves,
+    'heuristic_score_quadratic_difference_moves': heuristic_score_quadratic_difference_moves,
+    'heuristic_score_min_custom_score': heuristic_score_min_custom_score,
+    'heuristic_score_final_custom_score': heuristic_score_final_custom_score
+    }
+
+
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
@@ -39,8 +116,9 @@ def custom_score(game, player):
 
     # TODO: finish this function!
 
+    '''
     # HEURISTIC .
-    def player_moves(game, player):
+    def heuristic_score_player_moves(game, player):
         if game.is_winner(player):
             return float('inf')
         if game.is_loser(player):
@@ -51,7 +129,7 @@ def custom_score(game, player):
         return float(len(player_moves))
 
     # HEURISTIC improved_score.
-    def normal_difference_moves(game, player):
+    def heuristic_score_normal_difference_moves(game, player):
         if game.is_winner(player):
             return float('inf')
         if game.is_loser(player):
@@ -64,7 +142,7 @@ def custom_score(game, player):
 
 
     # HEURISTIC : difference of squared number of legal moves of player and opponent
-    def quadratic_difference_moves(game, player):
+    def heuristic_score_quadratic_difference_moves(game, player):
         if game.is_winner(player):
             return float('inf')
         if game.is_loser(player):
@@ -77,7 +155,7 @@ def custom_score(game, player):
 
 
     # HEURISTIC: min of 3 heuristics.
-    def min_custom_score(game, player):
+    def heuristic_score_min_custom_score(game, player):
         if game.is_winner(player):
             return float('inf')
         if game.is_loser(player):
@@ -90,7 +168,7 @@ def custom_score(game, player):
         return min(functions)
 
     # HEURISTIC: assign weights to 3 heuristics.
-    def final_custom_score(game, player, pm_weight, ndm_weight, qdm_weight):
+    def heuristic_score_final_custom_score(game, player, pm_weight, ndm_weight, qdm_weight):
         if game.is_winner(player):
             return float('inf')
         if game.is_loser(player):
@@ -105,8 +183,28 @@ def custom_score(game, player):
         return float(sum([i*j for i,j in zip(weights, functions)]))
 
 
+    heuristic = {
+    'heuristic_score_player_moves': heuristic_score_player_moves,
+    'heuristic_score_normal_difference_moves': heuristic_score_normal_difference_moves,
+    'heuristic_score_quadratic_difference_moves': heuristic_score_quadratic_difference_moves,
+    'heuristic_score_min_custom_score': heuristic_score_min_custom_score,
+    'heuristic_score_final_custom_score': heuristic_score_final_custom_score
+    }
+
     #return min_custom_score(game, player)
-    return final_custom_score(game, player, 0, 1, 0.4)
+    #return final_custom_score(game, player, 0, 1, 0.4)
+
+    '''
+
+
+    if game.is_winner(player):
+        return float('inf')
+    if game.is_loser(player):
+        return float('-inf')
+    
+    #return heuristic[sys.argv[1]](game, player) # uncomment this to run the $ ./run_heuristics.sh
+    return heuristic_score_final_custom_score(game, player)
+
     '''
     if game.is_winner(player):
         return float('inf')
